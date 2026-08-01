@@ -6,6 +6,7 @@ import { SectionHeader } from "@/components/section-header";
 import { GlassCard } from "@/components/glass-card";
 import { ContactForm } from "@/components/contact-form";
 import { profile, whatsappLink } from "@/lib/data";
+import { OG_IMAGE } from "@/lib/site";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -20,6 +21,11 @@ export const Route = createFileRoute("/contact")({
       { property: "og:description", content: "Let's build something the web remembers." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/contact" },
+      { property: "og:image", content: OG_IMAGE },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:image", content: OG_IMAGE },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "/contact" }],
   }),

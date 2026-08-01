@@ -5,6 +5,7 @@ import { SectionReveal } from "@/components/section-reveal";
 import { SectionHeader } from "@/components/section-header";
 import { GlassCard } from "@/components/glass-card";
 import { projects } from "@/lib/data";
+import { OG_IMAGE } from "@/lib/site";
 
 export const Route = createFileRoute("/projects/")({
   head: () => ({
@@ -21,6 +22,11 @@ export const Route = createFileRoute("/projects/")({
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/projects" },
+      { property: "og:image", content: OG_IMAGE },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:image", content: OG_IMAGE },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "/projects" }],
   }),

@@ -7,6 +7,7 @@ import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
 import { MagneticButton } from "./magnetic-button";
 import { TextRotator } from "./text-morph";
 import { profile } from "@/lib/data";
+import { useIdleReady } from "@/hooks/use-idle-ready";
 
 const HeroCanvas = lazy(() => import("./hero-canvas"));
 
@@ -14,6 +15,8 @@ export function Hero() {
   const { t, i18n } = useTranslation();
   const sectionRef = useRef<HTMLElement>(null);
   const [inView, setInView] = useState(false);
+  // Keep three.js off the critical path: mount only after the browser goes idle.
+  const idleReady = useIdleReady();
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -41,7 +44,7 @@ export function Hero() {
       <div aria-hidden className="aurora animate-gradient" />
       {/* 3D layer — only mounted while hero is visible to keep the GPU idle on scroll */}
       <div className="pointer-events-none absolute inset-0 z-[1] opacity-90 [mask-image:radial-gradient(60%_60%_at_70%_40%,#000_40%,transparent_75%)]">
-        {inView && (
+        {inView && idleReady && (
           <Suspense fallback={null}>
             <HeroCanvas />
           </Suspense>

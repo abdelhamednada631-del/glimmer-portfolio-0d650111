@@ -4,6 +4,7 @@ import { ArrowLeft, ExternalLink, Github } from "lucide-react";
 import { SectionReveal } from "@/components/section-reveal";
 import { GlassCard } from "@/components/glass-card";
 import { projects } from "@/lib/data";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/projects/$slug")({
   loader: ({ params }) => {
@@ -22,8 +23,9 @@ export const Route = createFileRoute("/projects/$slug")({
         { property: "og:description", content: p.tagline },
         { property: "og:type", content: "article" },
         { property: "og:url", content: `/projects/${p.slug}` },
-        { property: "og:image", content: p.cover },
-        { name: "twitter:image", content: p.cover },
+        { property: "og:image", content: absoluteUrl(p.cover) },
+        { name: "twitter:image", content: absoluteUrl(p.cover) },
+        { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [{ rel: "canonical", href: `/projects/${p.slug}` }],
       scripts: [

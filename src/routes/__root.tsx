@@ -17,6 +17,7 @@ import { Footer } from "@/components/footer";
 import { IntroExperience } from "@/components/intro";
 import { FabStack } from "@/components/fab-stack";
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { Monitoring, reportMonitoringError } from "@/components/monitoring";
 import { lazy, Suspense as ReactSuspense } from "react";
 const Analytics = lazy(() =>
   import("@vercel/analytics/react").then((m) => ({ default: m.Analytics })),
@@ -71,6 +72,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    void reportMonitoringError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
@@ -125,6 +127,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://vitals.vercel-insights.com", crossOrigin: "" },
+      { rel: "preconnect", href: "https://api.heronsignal.com", crossOrigin: "" },
+      { rel: "dns-prefetch", href: "https://api.heronsignal.com" },
       { rel: "dns-prefetch", href: "https://vitals.vercel-insights.com" },
       {
         rel: "icon",
@@ -159,7 +163,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" dir="ltr" className="dark">
+    <html lang="en" dir="ltr" className="dark" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
@@ -186,6 +190,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <LangSync />
       <SmoothScroll />
+      <Monitoring />
       <IntroExperience />
       <Nav />
       <main className="relative">

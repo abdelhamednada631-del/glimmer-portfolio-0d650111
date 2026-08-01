@@ -1,78 +1,95 @@
-- خطة تحسينات بصرية + Accessibility (بدون حذف أو تغيير محتوى)
 
-النطاق محصور في **Hero + Home** و **Projects (list + case study)**. كل شيء **additive** — ما فيش حذف لأي ملف/عنصر/نص/لون/تصميم، وما فيش تغيير في السلوك أو الـ layout.
+# خطة التسليم النهائي — أداء + SEO/Sharing + إصلاح Developer Mode + مراقبة حقيقية
 
-## 1. Micro-interactions polish
+كل التعديلات **إصلاحية/إضافية فقط**. مفيش حذف لأي ميزة، ولا تغيير في التصميم، ولا شيل أي أنيميشن أو مكتبة.
 
-`**src/components/hero.tsx**`
+---
 
-- إضافة hover tilt خفيف جدًا (`translate-y-[-2px]` + shadow lift عبر transition موجودة أصلاً) على الـ CTA buttons — بدون تغيير الحجم أو اللون.
-- تحسين الـ chips row: إضافة `transition-colors` + hover state خفيف على الـ `glass-subtle` (يستخدم متغير `--glass-3` الموجود).
-- ما فيش تغيير على الـ canvas أو النصوص أو الترتيب.
+## 1. الأداء (Performance 42 → المستهدف 90+)
 
-`**src/routes/index.tsx**` (Featured project card, Process cards, Skills chips)
+### التشخيص من الاسكرين شوتس
 
-- إضافة `group` + `group-hover:translate-x-0.5` خفيف على أيقونة `ArrowUpRight` في CTA — حركة صغيرة عند hover فقط.
-- تحسين hover على `GlassCard` الخاص بالـ Process: `hover:bg-[var(--glass-3)]` transition ناعمة (المتغير موجود، مش هيبوظ الثيم).
-- Skills chips: إضافة `transition-colors hover:text-foreground` (اللون الحالي `text-foreground/85` يبقى default).
+| المقياس | القيمة | السبب الحقيقي |
+|---|---|---|
+| TBT | **28,360 ms** | كل الشغل في `Other = 38.4s` — ده مش JS parsing (846ms بس). ده **رسم WebGL** بيتنفذ على الـmain thread أثناء التحميل. الـ`DemandDriver` بيعمل `invalidate()` كل frame → الكانفس فعليًا شغال 60fps من أول لحظة hydration |
+| LCP | 4.1s (element render delay **3,100 ms**) | الـ`IntroExperience` بيغطي الشاشة 2 ثانية بـoverlay أسود `z-[100]`، فالـLCP element (نص الـhero) مايتحسبش إلا بعد ما الـintro يختفي |
+| FCP | 3.2s + render-blocking **750 ms** | `styles.css` = 39.8 KiB blocking، جواه **16 `@import` لملفات fontsource** → كل الخطوط بتتحمّل قبل أول رسم |
+| Unused JS | hero-canvas 233.5 KiB + index 194.5 KiB | three.js بيتحمّل ويتنفّذ ضمن المسار الحرج |
 
-`**src/routes/projects.index.tsx**` و `**src/routes/projects.$slug.tsx**`
+### الإصلاحات (بدون أي خسارة بصرية)
 
-- إضافة hover state على cards المشاريع (lift خفيف + بورد glow يستخدم `--glass-border` الموجود).
-- إضافة `transition` ناعمة على صور الـ gallery في case study (scale 1 → 1.02 عند hover على المحتوي فقط، بدون قص الصور).
-- ما فيش تغيير في محتوى أو ترتيب أو تصميم البطاقات.
+**أ) الكانفس ثلاثي الأبعاد — نفس الشكل بالظبط، بس مايشتغلش وقت التحميل**
+- تأجيل mount الكانفس لحد ما: الـintro يخلص **و** `requestIdleCallback` (fallback timeout) يقول إن الـmain thread فاضي. حاليًا بيتـmount فورًا مع الـhero.
+- تحديد سقف frame rate في `DemandDriver` عند **~30fps** (`invalidate` كل ~33ms بدل كل frame). الحركة بطيئة أصلاً (`rotation 0.18/0.22`) فالفرق البصري صفر، والشغل على الـmain thread ينزل للنص.
+- إيقاف الـinvalidate تمامًا لما الـhero يخرج من الـviewport (موجود observer، هنربطه بالـdriver كمان مش بس بالـmount).
+- احترام `navigator.connection.saveData` و`deviceMemory <= 4` بخفض dpr — نفس المشهد.
 
-## 2. Accessibility (a11y) — بدون تغيير مرئي
+**ب) الـIntro — يفضل زي ما هو، بس مايأخّرش الـLCP**
+- الـhero يترسم تحت الـintro من أول SSR (هو كده فعلاً)، لكن الـoverlay `bg-black` بيمنع القياس. الحل: بدل `bg-black` مصمت نخليه `bg-background` مع نفس المظهر، ونقلّل مدة العرض من 2000ms إلى **1400ms** (الأنيميشن الأطول جواه 1.4s فمش هيتقطع)، ونضيف `pointer-events` صح.
+- بديل أفضل لو حابب صفر تغيير في التوقيت: نسيب الـ2s ونضيف `fetchpriority` + preload لنص الـhero — بس ده مش هيحل الـ3.1s render delay. **التوصية: 1400ms.** (لو رافض، قوللي وأسيبها 2000ms.)
 
-**Icon-only controls**
+**ج) الخطوط — أكبر مكسب في FCP (750ms)**
+- شيل الـ16 `@import` من `styles.css` واستبدالهم بـ`<link rel="preload" as="font">` + `@font-face` بـ`font-display: swap` للأوزان المستخدمة فعليًا (Instrument Serif 400، Inter 400/500/600/700، JetBrains Mono 400/500، Rubik + IBM Plex Arabic تتحمّل **فقط** لما `dir="rtl"`).
+- النتيجة: `styles.css` ينزل من 39.8 KiB لأقل من 12 KiB، ومايبقاش blocking لكل الخطوط. **نفس الخطوط، نفس الشكل** — بس التحميل بقى غير حاجب.
 
-- التأكد من وجود `aria-label` على كل زر/رابط icon-only في: `nav.tsx`, `footer.tsx`, `whatsapp-fab.tsx`, `dev-mode.tsx`, `theme-toggle.tsx`, `lang-toggle.tsx`. إضافة اللي ناقص فقط.
-- روابط GitHub / Live في `index.tsx` و `projects.$slug.tsx` — التأكد إن كل `<a target="_blank">` عنده `rel="noreferrer"` (موجود) + `aria-label` وصفي لما النص مش كافي.
+**د) تقسيم أدق**
+- `framer-motion` و`lenis` يفضلوا زي ما هم (مطلوبين للتفاعل الأول)، لكن `@vercel/analytics` + `speed-insights` يتأجّلوا لبعد `load` بدل `Suspense` فقط.
+- إضافة `content-visibility: auto` للأقسام تحت الـfold (صفر تغيير بصري، بيقلّل Style & Layout).
 
-**Focus visibility**
+**التحقق:** بناء production + Lighthouse mobile محلي قبل/بعد، وأرفعلك جدول بالأرقام.
 
-- إضافة `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background` على الأزرار والروابط اللي مالهاش focus ring واضح حالياً (CTAs في Hero و Featured و CTA section). الحلقة تظهر فقط عند keyboard focus — مش هتأثر على الماوس.
+---
 
-**Semantics**
+## 2. نتائج HeronSignal
 
-- التأكد من وجود `<main>` واحد فقط (موجود في `__root.tsx` عبر `<main className="relative">` — تأكيد فقط).
-- التأكد إن `alt` على الصور موجود ووصفي (cover في Home + gallery في case study). إضافة `alt=""` للصور الديكورية لو موجودة بدون معنى.
-- التأكد من H1 واحد على كل صفحة (Hero يحتوي H1، الصفحات الداخلية تستخدم H1 مرة واحدة).
+### أ) `Missing og:image` (Metadata & Sharing)
+- توليد صورة OG حقيقية 1200×630 بهوية الموقع (المونوجرام AN + الاسم + السطر التعريفي + نفس الـgradient) وحفظها في `public/og.png`.
+- إضافتها **على الـleaf routes فقط** (مش `__root`) بـURL مطلق: `https://abdelhamednada.vercel.app/og.png` — مع `twitter:image`.
+- صفحات المشاريع/الـcase study تستخدم صورة الغلاف بتاعتها كـ`og:image` (موجودة أصلاً في `data.ts`) — أنسب من صورة عامة.
 
-**Reduced motion**
+### ب) `SEO-friendly public basics — needs work`
+كل البنود عندها "good"، فالتقييم الأحمر جاي من الـSpeed. حل البند 1 بيقفل ده تلقائيًا.
 
-- إضافة `motion-reduce:transition-none motion-reduce:hover:transform-none` على الـ hover animations الجديدة اللي هتتضاف — احترام `prefers-reduced-motion`.
+### ج) تركيب HeronSignal (Monitoring)
+- هقرأ `https://heronsignal.com/llms.txt` وأنفّذ خطوات التركيب الرسمية لـTanStack Start بالحرف (مش تخمين)، وأربط `captureError()` بالـ`errorComponent` الموجود في `__root.tsx` وبـ`reportLovableError`.
+- **محتاج منك**: الـpublic key من داشبورد HeronSignal. من غيره هركّب الكود كامل وأسيب الـkey يتقري من متغير بيئة عشان تلزقه في خطوة واحدة.
 
-**Tap targets (mobile)**
+---
 
-- التأكد إن كل الـ icon buttons ≥ 44x44 على mobile (WhatsApp/Dev FABs موجودين كده، nav icons — فحص وإضافة `min-h-11 min-w-11` لو ناقص).
+## 3. زر Developer Mode — الباجّ الحقيقي
 
-## 3. الملفات المتوقع تعديلها
+**السبب المؤكد:** `FabStack` هو `<div className="pointer-events-none ...">`، و`DevModeButton` بيرندر الـoverlay **جوّه** الـdiv ده. الـoverlay `fixed inset-0` بيورّث `pointer-events: none`، فزرار الـ`X` والخلفية **مش بيستقبلوا كليك أصلاً** — الزرار اللي بيفتح الدرج شغال لأن عليه `pointer-events-auto` صراحةً، لكن زرار الإغلاق لأ.
 
-- `src/components/hero.tsx` — hover states + focus rings (additive classes only)
-- `src/routes/index.tsx` — hover polish على Featured/Process/Skills + focus rings + aria-labels
-- `src/routes/projects.index.tsx` — hover على cards + focus rings
-- `src/routes/projects.$slug.tsx` — hover على gallery + focus rings + aria-labels
-- `src/components/nav.tsx`, `src/components/footer.tsx` — aria-labels فقط لو ناقصة، + tap-target sizing
-- `src/components/glass-card.tsx` — قد نضيف optional `interactive` prop (opt-in، الاستخدامات الحالية ما تتأثرش)
+**الإصلاح:**
+- نقل الـoverlay لـ`createPortal(document.body)` — يخرج نهائيًا من شجرة الـ`pointer-events-none`.
+- إضافة `pointer-events-auto` على الـoverlay وزرار الإغلاق كضمان مزدوج.
+- إضافة `type="button"` على زرار الـX.
 
-## 4. Out of scope (مضمون إنها ما تتغيرش)
+**إصلاحات iOS في نفس الدرج:**
+- قفل تمرير الصفحة وقت فتح الدرج (`overflow: hidden` على body + إيقاف Lenis) — حاليًا الصفحة بتتمرر ورا الدرج على iOS.
+- `max-h-[85dvh]` + `-webkit-overflow-scrolling: touch` + `env(safe-area-inset-bottom)` عشان الدرج مايتقصّش تحت الـhome indicator.
+- Focus trap + إرجاع الفوكس للزرار عند الإغلاق + `role="dialog"` و`aria-modal="true"`.
+- تقليل `backdrop-blur-sm` على الـoverlay إلى طبقة أخف على الأجهزة اللمسية (نفس المظهر تقريبًا، بيمنع اللاج على iOS).
 
-- ❌ ما فيش حذف لأي مكون أو route أو نص أو صورة أو حقل.
-- ❌ ما فيش تغيير في الألوان أو الخطوط أو الـ tokens في `styles.css`.
-- ❌ ما فيش تغيير في الـ layout / grid / spacing الأساسي.
-- ❌ ما فيش تعديل على الـ 3D canvas أو intro أو smooth scroll أو i18n.
-- ❌ ما فيش تعديل على SEO metadata أو sitemap أو الـ blog article.
-- ❌ ما فيش dependencies جديدة.
+---
 
-## 5. التحقق
+## 4. مراجعة تسليم نهائية (code review)
 
-- `bun run build` نظيف.
-- فحص بصري بـ Playwright (390×844 + 1280×900، EN + AR) لـ `/`, `/projects`, `/projects/portfolio` — screenshots قبل/بعد للتأكد من عدم وجود تغيير في اللاي أوت.
-- keyboard tab-through على الصفحة الرئيسية 
-- للتأكد من ظهور focus rings.
-- قبل التنفيذ:
-  1) خلي arrow hover في index.tsx RTL-aware: rtl:group-hover:-translate-x-0.5 جنب الأصلي.
-  2) ضيف نفس focus-visible ring (اللي هتضيفه للـ CTAs) على project cards في projects.index.tsx بالظبط.
-  3) تأكد الـ gallery image container فيه overflow-hidden قبل تطبيق scale-102.
-  &nbsp;
+- فحص كل الراوتس على iPhone viewport (390×844) + Safari engine عبر Playwright، EN + AR، dark + light.
+- التأكد من صفر horizontal overflow، صفر console errors، وكل الأزرار الأيقونية عندها `aria-label`.
+- `bun run build` نظيف + typecheck.
+- تقرير نهائي بالأرقام قبل/بعد.
+
+---
+
+## الملفات المتوقع تعديلها
+
+`src/components/dev-mode.tsx` · `src/components/fab-stack.tsx` · `src/components/hero-canvas.tsx` · `src/components/hero.tsx` · `src/components/intro.tsx` · `src/components/smooth-scroll.tsx` · `src/styles.css` · `src/routes/__root.tsx` · `src/routes/index.tsx` + باقي الـleaf routes (og:image) · `public/og.png` (جديد) · ملف تركيب HeronSignal (جديد)
+
+## خارج النطاق (مضمون ما يتغيرش)
+
+❌ حذف أي مكوّن أو route أو ميزة أو مكتبة · ❌ تغيير أي لون أو خط أو token أو layout · ❌ تغيير شكل الـ3D أو الـglassmorphism · ❌ لمس i18n أو الـblog أو الـsitemap القائم
+
+---
+
+**سؤال واحد قبل التنفيذ:** الـHeronSignal public key — تبعتهولي دلوقتي ولا أركّب الكود وأسيب المكان جاهز ليه؟ وكمان: موافق على تقليل مدة الـintro من 2000ms لـ1400ms (مكسب ~600ms في LCP، الأنيميشن كامل مش هيتقطع)؟

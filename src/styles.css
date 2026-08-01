@@ -268,6 +268,23 @@
   opacity: 0.45;
 }
 
+/*
+ * The aurora layer is a viewport-sized, 60px-blurred gradient. Animating
+ * `background-position` on it forced a full re-rasterization of that blur on
+ * every frame — the single largest source of main-thread/GPU load (and device
+ * heat). Driving the exact same drift with a compositor-only transform keeps
+ * the motion identical while the layer rasterizes just once.
+ */
+.aurora.animate-gradient {
+  background-size: auto;
+  animation: aurora-drift 12s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-drift {
+  from { transform: translate3d(-2%, -1.5%, 0) scale(1.04); }
+  to   { transform: translate3d(2%, 1.5%, 0) scale(1.1); }
+}
+
 /* Pause heavy background animations when the tab isn't visible */
 html:not(:focus-within) .animate-gradient,
 html:not(:focus-within) .animate-pulse-soft,
