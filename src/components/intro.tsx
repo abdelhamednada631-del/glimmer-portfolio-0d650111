@@ -13,7 +13,7 @@ export function IntroExperience() {
       sessionStorage.setItem("an_intro_seen", "1");
     } catch {}
     setShow(true);
-    const t = window.setTimeout(() => setShow(false), 2000);
+    const t = window.setTimeout(() => setShow(false), 1400);
     return () => window.clearTimeout(t);
   }, [reduced]);
 

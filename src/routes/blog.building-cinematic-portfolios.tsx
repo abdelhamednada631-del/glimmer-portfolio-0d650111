@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { SectionReveal, Kicker } from "@/components/section-reveal";
 import { GlassCard } from "@/components/glass-card";
+import { OG_IMAGE } from "@/lib/site";
 
 const TITLE = "Building Cinematic Developer Portfolios";
 const DESCRIPTION =
@@ -16,6 +17,11 @@ export const Route = createFileRoute("/blog/building-cinematic-portfolios")({
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "article" },
       { property: "og:url", content: "/blog/building-cinematic-portfolios" },
+      { property: "og:image", content: OG_IMAGE },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:image", content: OG_IMAGE },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "/blog/building-cinematic-portfolios" }],
