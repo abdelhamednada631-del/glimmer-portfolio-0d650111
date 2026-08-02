@@ -55,7 +55,7 @@ function ProjectsIndex() {
                   className="group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   aria-label={`${isAr ? p.titleAr : p.title} — ${t("projects.view_case")}`}
                 >
-                  <GlassCard className="overflow-hidden transition duration-300 group-hover:-translate-y-0.5 group-hover:bg-[var(--glass-3)] motion-reduce:transition-none motion-reduce:group-hover:translate-y-0">
+                  <GlassCard sheen className="overflow-hidden transition duration-300 group-hover:-translate-y-0.5 group-hover:bg-[var(--glass-3)] motion-reduce:transition-none motion-reduce:group-hover:translate-y-0">
                     <div className="grid gap-0 lg:grid-cols-[1fr_1.1fr]">
                       <div className="relative min-h-72 overflow-hidden">
                         <img

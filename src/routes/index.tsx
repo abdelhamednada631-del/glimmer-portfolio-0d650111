@@ -142,7 +142,7 @@ function HomePage() {
           </SectionReveal>
 
           <SectionReveal delay={0.1}>
-            <GlassCard className="mt-12 overflow-hidden" glow>
+            <GlassCard sheen className="mt-12 overflow-hidden" glow>
               <div className="grid gap-0 lg:grid-cols-[1.1fr_1fr]">
                 <div className="p-8 sm:p-10 lg:p-12">
                   <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
