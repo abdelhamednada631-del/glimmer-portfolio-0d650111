@@ -5,6 +5,8 @@ import { SectionReveal } from "@/components/section-reveal";
 import { GlassCard } from "@/components/glass-card";
 import { projects } from "@/lib/data";
 import { absoluteUrl } from "@/lib/site";
+import { useEffect } from "react";
+import { trackEvent } from "@/components/monitoring";
 
 export const Route = createFileRoute("/projects/$slug")({
   loader: ({ params }) => {
@@ -76,6 +78,12 @@ function ProjectDetail() {
   const p = projects.find((x) => x.slug === slug)!;
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith("ar");
+
+  useEffect(() => {
+    void trackEvent("project_view", { slug });
+  }, [slug]);
+
+
 
 
   return (
