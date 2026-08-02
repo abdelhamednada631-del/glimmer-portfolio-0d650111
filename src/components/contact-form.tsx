@@ -5,6 +5,7 @@ import { z } from "zod";
 import { motion } from "framer-motion";
 import { Send, MessageCircle } from "lucide-react";
 import { profile, whatsappLink } from "@/lib/data";
+import { trackEvent, trackLog } from "./monitoring";
 
 export function ContactForm() {
   const { t } = useTranslation();
@@ -31,6 +32,9 @@ export function ContactForm() {
         fieldErrors[k] = issue.message;
       }
       setErrors(fieldErrors);
+      void trackLog("warn", "contact_validation_failed", {
+        fields: Object.keys(fieldErrors).join(","),
+      });
       return;
     }
     setErrors({});
@@ -38,6 +42,7 @@ export function ContactForm() {
     const mailto = `mailto:${profile.email}?subject=${encodeURIComponent(
       "Portfolio inquiry — " + r.data.name,
     )}&body=${encodeURIComponent(body)}`;
+    void trackEvent("contact_submit");
     window.location.href = mailto;
     setSent(true);
   }
