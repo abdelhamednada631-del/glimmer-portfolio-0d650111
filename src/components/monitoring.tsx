@@ -1,5 +1,6 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import type { HeronSignalPayload } from "@heronsignal/web";
 import { HERONSIGNAL_PUBLIC_KEY } from "@/lib/monitoring-key";
 
@@ -15,17 +16,32 @@ const PUBLIC_KEY =
   HERONSIGNAL_PUBLIC_KEY.trim() ||
   undefined;
 
+export const MONITORING_ENABLED = Boolean(PUBLIC_KEY);
+
 let started = false;
+let startPromise: Promise<void> | null = null;
 
 async function start() {
-  if (started || !PUBLIC_KEY) return;
+  if (!PUBLIC_KEY) return;
+  if (started) return startPromise ?? undefined;
   started = true;
-  try {
-    const { initHeronSignal } = await import("@heronsignal/web");
-    await initHeronSignal({ publicKey: PUBLIC_KEY });
-  } catch {
-    // Monitoring must never break the site.
-  }
+  startPromise = (async () => {
+    try {
+      const { initHeronSignal } = await import("@heronsignal/web");
+      await initHeronSignal({
+        publicKey: PUBLIC_KEY,
+        // Everything the public scan looks for: sessions, frontend errors,
+        // failed requests and resource failures.
+        captureRuntimeErrors: true,
+        captureNetworkFailures: true,
+        captureResourceErrors: true,
+        captureConsole: true,
+      });
+    } catch {
+      // Monitoring must never break the site.
+    }
+  })();
+  return startPromise;
 }
 
 /** Report a caught error to HeronSignal (safe to call before init). */
@@ -51,7 +67,25 @@ export async function trackEvent(name: string, props?: HeronSignalPayload) {
   }
 }
 
+/** Structured log line (e.g. a failed contact submit). */
+export async function trackLog(
+  level: "debug" | "info" | "warn" | "error",
+  message: string,
+  data?: HeronSignalPayload,
+) {
+  if (!PUBLIC_KEY) return;
+  try {
+    const mod = await import("@heronsignal/web");
+    mod.log(level, message, data);
+  } catch {
+    /* noop */
+  }
+}
+
 export function Monitoring() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const firstPath = useRef(true);
+
   useEffect(() => {
     if (!PUBLIC_KEY) return;
     let idle = 0;
@@ -71,5 +105,17 @@ export function Monitoring() {
       window.clearTimeout(idle);
     };
   }, []);
+
+  // SPA route changes: the tracker only sees the first document load, so every
+  // client-side navigation is reported explicitly.
+  useEffect(() => {
+    if (!PUBLIC_KEY) return;
+    if (firstPath.current) {
+      firstPath.current = false;
+      return;
+    }
+    void trackEvent("pageview", { path: pathname });
+  }, [pathname]);
+
   return null;
 }
