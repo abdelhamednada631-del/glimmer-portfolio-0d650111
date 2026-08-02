@@ -6,6 +6,7 @@ import { Code2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Logo } from "./logo";
 import { STACK, ARCH } from "@/lib/dev-manifest";
+import { trackEvent } from "./monitoring";
 
 export function DevModeButton() {
   const { t } = useTranslation();
@@ -126,7 +127,10 @@ export function DevModeButton() {
       <motion.button
         ref={triggerRef}
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+          void trackEvent("devmode_open");
+        }}
         aria-label="View developer mode"
         aria-expanded={open}
         aria-haspopup="dialog"
