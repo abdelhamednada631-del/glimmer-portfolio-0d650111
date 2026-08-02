@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import { whatsappLink } from "@/lib/data";
+import { trackEvent } from "./monitoring";
 
 export function WhatsAppFab() {
   return (
@@ -19,6 +20,7 @@ export function WhatsAppFab() {
         target="_blank"
         rel="noreferrer"
         aria-label="Chat on WhatsApp"
+        onClick={() => void trackEvent("whatsapp_click")}
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 1.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}

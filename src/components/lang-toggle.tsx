@@ -1,6 +1,7 @@
 "use client";
 import { useTranslation } from "react-i18next";
 import { applyDirection } from "@/lib/i18n";
+import { trackEvent } from "./monitoring";
 
 export function LangToggle() {
   const { i18n } = useTranslation();
@@ -8,6 +9,7 @@ export function LangToggle() {
   function swap() {
     i18n.changeLanguage(next);
     applyDirection(next);
+    void trackEvent("lang_switch", { to: next });
   }
   return (
     <button
