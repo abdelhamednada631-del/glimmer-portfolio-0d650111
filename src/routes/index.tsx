@@ -113,15 +113,15 @@ function HomePage() {
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {skills.map((g, i) => (
               <SectionReveal key={g.group} delay={i * 0.05}>
-                <GlassCard className="h-full p-6">
-                  <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                <GlassCard className="lift h-full p-6">
+                  <div className="eyebrow-accent text-xs uppercase tracking-[0.18em]">
                     {g.group}
                   </div>
                   <ul className="mt-4 flex flex-wrap gap-1.5">
                     {g.items.map((s) => (
                       <li
                         key={s}
-                        className="rounded-full glass-subtle px-3 py-1 text-[12px] text-foreground/85 transition-colors hover:text-foreground hover:bg-[var(--glass-3)] motion-reduce:transition-none"
+                        className="accent-chip rounded-full px-3 py-1 text-[12px] transition-colors motion-reduce:transition-none"
                       >
                         {s}
                       </li>
@@ -145,7 +145,7 @@ function HomePage() {
             <GlassCard sheen className="mt-12 overflow-hidden" glow>
               <div className="grid gap-0 lg:grid-cols-[1.1fr_1fr]">
                 <div className="p-8 sm:p-10 lg:p-12">
-                  <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                  <div className="eyebrow-accent font-mono text-[11px] uppercase tracking-[0.2em]">
                     {featured.year} · {isAr ? featured.roleAr : featured.role}
                   </div>
                   <h3 className="mt-3 font-display text-[clamp(1.8rem,4vw,3rem)] leading-[1.05] tracking-tight">
@@ -159,7 +159,7 @@ function HomePage() {
                     {Object.values(featured.stack).flat().slice(0, 6).map((s) => (
                       <span
                         key={s}
-                        className="rounded-full glass-subtle px-3 py-1 text-[11px] text-foreground/85 transition-colors hover:bg-[var(--glass-3)] motion-reduce:transition-none"
+                        className="accent-chip rounded-full px-3 py-1 text-[11px] transition-colors motion-reduce:transition-none"
                       >
                         {s}
                       </span>
@@ -221,8 +221,8 @@ function HomePage() {
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {process.map((p, i) => (
               <SectionReveal key={p.t} delay={i * 0.06}>
-                <GlassCard className="h-full p-6 transition-colors duration-300 hover:bg-[var(--glass-3)] motion-reduce:transition-none">
-                  <div className="font-mono text-xs text-muted-foreground">0{i + 1}</div>
+                <GlassCard className="lift h-full p-6 hover:bg-[var(--glass-3)]">
+                  <div className="text-accent font-mono text-xs">0{i + 1}</div>
                   <div className="mt-3 font-display text-2xl tracking-tight">{p.t}</div>
                   <p className="mt-2 text-sm text-muted-foreground">{p.d}</p>
                 </GlassCard>
@@ -237,7 +237,7 @@ function HomePage() {
         <div className="mx-auto max-w-4xl">
           <SectionReveal>
             <GlassCard className="p-10 sm:p-14 text-center" glow>
-              <div className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              <div className="eyebrow-accent font-mono text-xs uppercase tracking-[0.2em]">
                 {t("contact.kicker")}
               </div>
               <h2 className="mt-4 font-display text-[clamp(2rem,5vw,3.4rem)] leading-tight tracking-tight">
