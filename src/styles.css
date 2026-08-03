@@ -678,31 +678,6 @@ html:not(:focus-within) .animate-spin-slow {
     color-mix(in oklab, var(--aurora-a) 7%, transparent) 100%
   );
 }
-.glass::after,
-.glass-strong::after {
-  content: "";
-  position: absolute;
-  inset-inline: 18%;
-  bottom: 0;
-  height: 1px;
-  pointer-events: none;
-  z-index: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in oklab, var(--aurora-b) 22%, transparent),
-    transparent
-  );
-}
-/* The noise / sheen overlays also use ::after — keep them the visible one. */
-.noise.glass::after,
-.noise.glass-strong::after,
-.sheen.glass::after,
-.sheen.glass-strong::after {
-  inset: 0;
-  height: auto;
-}
-
 /* Gradient rim for featured surfaces. Opt-in, no layout impact. */
 @utility glass-rim {
   position: relative;
