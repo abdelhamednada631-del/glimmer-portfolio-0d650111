@@ -461,3 +461,139 @@ html:not(:focus-within) .animate-spin-slow {
     transition: none;
   }
 }
+
+/* =====================================================================
+   Color refinement pass — additive only.
+   Every rule below either introduces a new token or overrides an
+   existing one for a specific theme. Nothing above is removed and no
+   layout, spacing or typography value is touched.
+   ===================================================================== */
+
+:root {
+  /* Brand-tinted depth used by the glass primitives instead of flat black. */
+  --shadow-color: 250 15% 4%;
+  --glass-shadow: 0 30px 60px -25px rgb(0 0 0 / 0.55);
+  --glass-shadow-strong: 0 40px 80px -30px rgb(0 0 0 / 0.6);
+  --hairline: color-mix(in oklab, var(--aurora-a) 22%, transparent);
+}
+
+/* ---------- DARK: keep AMOLED black, add tint + separation ---------- */
+.dark,
+:root {
+  /* Borders were nearly invisible against pure black. */
+  --border: oklch(1 0 0 / 11%);
+  --input: oklch(1 0 0 / 15%);
+  /* A whisper of brand in the glass so surfaces read as glass, not grey. */
+  --glass-1: color-mix(in oklab, var(--aurora-a) 4%, oklch(1 0 0 / 4%));
+  --glass-2: color-mix(in oklab, var(--aurora-a) 5%, oklch(1 0 0 / 7%));
+  --glass-3: color-mix(in oklab, var(--aurora-a) 6%, oklch(1 0 0 / 10%));
+  --glass-4: color-mix(in oklab, var(--aurora-a) 7%, oklch(1 0 0 / 14%));
+  --glass-border: color-mix(in oklab, var(--aurora-b) 14%, oklch(1 0 0 / 11%));
+  --glass-highlight: oklch(1 0 0 / 18%);
+  --muted-foreground: oklch(0.72 0.008 275);
+  --card: oklch(0.065 0.006 275);
+  --popover: oklch(0.09 0.008 275);
+  --secondary: oklch(0.19 0.008 275);
+  --accent: oklch(0.23 0.01 275);
+}
+
+/* ---------- LIGHT: lift white-on-white flatness ---------- */
+.light {
+  /* A faintly cool paper tone so white cards can float above it. */
+  --background: oklch(0.976 0.004 265);
+  --foreground: oklch(0.16 0.015 275);
+  --card: oklch(0.995 0.002 265);
+  --card-foreground: oklch(0.16 0.015 275);
+  --popover: oklch(1 0 0);
+  --primary: oklch(0.17 0.02 275);
+  --secondary: oklch(0.945 0.006 265);
+  --muted: oklch(0.945 0.006 265);
+  --muted-foreground: oklch(0.46 0.018 275);
+  --accent: oklch(0.915 0.012 270);
+  --border: color-mix(in oklab, var(--aurora-a) 12%, oklch(0 0 0 / 9%));
+  --input: color-mix(in oklab, var(--aurora-a) 14%, oklch(0 0 0 / 12%));
+  --ring: oklch(0.52 0.16 282);
+
+  --glass-1: oklch(1 0 0 / 62%);
+  --glass-2: oklch(1 0 0 / 72%);
+  --glass-3: oklch(1 0 0 / 82%);
+  --glass-4: oklch(1 0 0 / 90%);
+  --glass-border: color-mix(in oklab, var(--aurora-a) 16%, oklch(1 0 0 / 70%));
+  --glass-highlight: oklch(1 0 0 / 95%);
+
+  /* Cool, brand-tinted shadows read far cleaner than neutral black on paper. */
+  --glass-shadow:
+    0 1px 2px color-mix(in oklab, var(--aurora-a) 10%, transparent),
+    0 18px 40px -22px color-mix(in oklab, var(--aurora-a) 45%, transparent);
+  --glass-shadow-strong:
+    0 1px 2px color-mix(in oklab, var(--aurora-a) 12%, transparent),
+    0 28px 60px -26px color-mix(in oklab, var(--aurora-a) 55%, transparent);
+  --hairline: color-mix(in oklab, var(--aurora-a) 30%, transparent);
+}
+
+/* Route the new shadow tokens through the existing glass primitives. */
+.glass {
+  box-shadow:
+    inset 0 1px 0 0 var(--glass-highlight),
+    var(--glass-shadow);
+}
+.glass-strong {
+  box-shadow:
+    inset 0 1px 0 0 var(--glass-highlight),
+    var(--glass-shadow-strong);
+}
+.light .glass-subtle {
+  box-shadow: inset 0 1px 0 0 var(--glass-highlight);
+}
+
+/* Aurora: warmer, more present in light; unchanged geometry. */
+.light .aurora {
+  opacity: 0.55;
+  filter: blur(70px) saturate(125%);
+}
+
+/* The mid brand stop is too light to read as text on paper — darken the
+   gradient only in light mode, keeping the same hue journey. */
+.light .text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    oklch(0.52 0.2 285) 0%,
+    oklch(0.58 0.13 225) 50%,
+    oklch(0.6 0.15 340) 100%
+  );
+}
+
+/* Selection follows the theme instead of a fixed violet wash. */
+.light ::selection {
+  background: color-mix(in oklab, var(--aurora-a) 24%, transparent);
+  color: var(--color-foreground);
+}
+
+/* Scrollbar: brand-tinted, visible on paper. */
+.light ::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--aurora-a) 32%, transparent);
+  background-clip: padding-box;
+}
+.light ::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--aurora-a) 48%, transparent);
+  background-clip: padding-box;
+}
+
+/* Noise is invisible in light mode with overlay blending — switch the blend
+   so the grain still adds texture on pale surfaces. */
+.light .noise::after {
+  opacity: 0.03;
+  mix-blend-mode: multiply;
+}
+
+/* A hairline top edge on large glass surfaces, echoing the brand. */
+.glass::before,
+.glass-strong::before {
+  content: "";
+  position: absolute;
+  inset-inline: 12%;
+  top: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--hairline), transparent);
+}
