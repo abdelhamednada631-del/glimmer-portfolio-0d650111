@@ -55,7 +55,7 @@ function ProjectsIndex() {
                   className="group block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   aria-label={`${isAr ? p.titleAr : p.title} — ${t("projects.view_case")}`}
                 >
-                  <GlassCard sheen className="overflow-hidden transition duration-300 group-hover:-translate-y-0.5 group-hover:bg-[var(--glass-3)] motion-reduce:transition-none motion-reduce:group-hover:translate-y-0">
+                  <GlassCard sheen className="glass-rim lift overflow-hidden transition duration-300 group-hover:-translate-y-0.5 group-hover:bg-[var(--glass-3)] motion-reduce:transition-none motion-reduce:group-hover:translate-y-0">
                     <div className="grid gap-0 lg:grid-cols-[1fr_1.1fr]">
                       <div className="relative min-h-72 overflow-hidden">
                         <img
@@ -68,7 +68,7 @@ function ProjectsIndex() {
                         <div className="absolute inset-0 bg-gradient-to-tr from-black/55 via-transparent to-transparent" />
                       </div>
                       <div className="p-8 sm:p-10 lg:p-12">
-                        <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                        <div className="eyebrow-accent font-mono text-[11px] uppercase tracking-[0.2em]">
                           {p.year} · {isAr ? p.roleAr : p.role}
                         </div>
                         <h3 className="mt-3 font-display text-[clamp(1.6rem,3.4vw,2.6rem)] leading-tight tracking-tight">
@@ -81,13 +81,13 @@ function ProjectsIndex() {
                           {Object.values(p.stack).flat().slice(0, 6).map((s) => (
                             <span
                               key={s}
-                              className="rounded-full glass-subtle px-3 py-1 text-[11px] text-foreground/85"
+                              className="accent-chip rounded-full px-3 py-1 text-[11px]"
                             >
                               {s}
                             </span>
                           ))}
                         </div>
-                        <div className="mt-8 inline-flex items-center gap-2 text-sm">
+                        <div className="mt-8 inline-flex items-center gap-2 text-sm text-accent">
                           {t("projects.view_case")}
                           <ArrowUpRight className="size-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:group-hover:-translate-x-0.5 motion-reduce:transition-none" />
                         </div>

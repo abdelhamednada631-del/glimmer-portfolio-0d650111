@@ -41,7 +41,7 @@ export function SectionReveal({
 
 export function Kicker({ children }: { children: ReactNode }) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full glass-subtle px-3 py-1.5 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+    <div className="inline-flex items-center gap-2 rounded-full glass-subtle px-3 py-1.5 text-[11px] uppercase tracking-[0.18em] eyebrow-accent">
       <span className="size-1.5 rounded-full brand-gradient animate-pulse-soft" />
       {children}
     </div>
