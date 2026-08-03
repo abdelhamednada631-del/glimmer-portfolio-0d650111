@@ -51,7 +51,7 @@ function ContactPage() {
 
           <div className="mt-12 grid gap-6 lg:grid-cols-[1.2fr_1fr]">
             <SectionReveal>
-              <GlassCard className="p-8 sm:p-10" glow>
+              <GlassCard className="glass-rim p-8 sm:p-10" glow>
                 <ContactForm />
               </GlassCard>
             </SectionReveal>

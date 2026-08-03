@@ -139,7 +139,7 @@ function ProjectDetail() {
       <section className="relative z-[1] px-4 pb-8">
         <div className="mx-auto max-w-6xl">
           <SectionReveal delay={0.05}>
-            <GlassCard className="overflow-hidden">
+            <GlassCard className="glass-rim overflow-hidden">
               <img
                 src={p.cover}
                 alt={`${p.title} — hero`}
@@ -197,7 +197,7 @@ function ProjectDetail() {
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {p.features.map((f, i) => (
               <SectionReveal key={f.t} delay={i * 0.03}>
-                <GlassCard className="h-full p-6">
+                <GlassCard className="lift h-full p-6">
                   <div className="font-display text-lg">{f.t}</div>
                   <p className="mt-2 text-sm text-muted-foreground">{f.d}</p>
                 </GlassCard>
@@ -261,7 +261,7 @@ function ProjectDetail() {
             <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {p.commands.map((c, i) => (
                 <SectionReveal key={c.c} delay={i * 0.02}>
-                  <GlassCard className="p-5">
+                  <GlassCard className="lift p-5">
                     <div className="flex items-center justify-between">
                       <code className="font-mono text-sm text-foreground">{c.c}</code>
                       <span className="rounded-full glass-subtle px-2.5 py-0.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
@@ -285,7 +285,7 @@ function ProjectDetail() {
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             {p.gallery.map((g, i) => (
               <SectionReveal key={g.src} delay={i * 0.05}>
-                <GlassCard className="group overflow-hidden transition-colors duration-300 hover:bg-[var(--glass-3)] motion-reduce:transition-none">
+                <GlassCard className="lift group overflow-hidden hover:bg-[var(--glass-3)]">
                   <div className="overflow-hidden">
                     <img
                       src={g.src}

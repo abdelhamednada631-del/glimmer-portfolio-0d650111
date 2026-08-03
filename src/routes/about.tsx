@@ -48,7 +48,7 @@ function AboutPage() {
           </SectionReveal>
 
           <SectionReveal delay={0.06}>
-            <GlassCard className="mt-10 p-8 sm:p-12" glow>
+            <GlassCard className="glass-rim mt-10 p-8 sm:p-12" glow>
               <p className="text-pretty text-lg leading-relaxed text-foreground/90">
                 {isAr ? profile.summaryAr : profile.summary}
               </p>
@@ -91,7 +91,7 @@ function AboutPage() {
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {highlights.map((h, i) => (
               <SectionReveal key={h.title} delay={i * 0.05}>
-                <GlassCard className="p-6">
+                <GlassCard className="lift p-6">
                   <div className="font-display text-2xl">{isAr ? h.titleAr : h.title}</div>
                   <p className="mt-2 text-sm text-muted-foreground">{isAr ? h.descAr : h.desc}</p>
                 </GlassCard>
@@ -109,7 +109,7 @@ function AboutPage() {
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {skills.map((g, i) => (
               <SectionReveal key={g.group} delay={i * 0.04}>
-                <GlassCard className="h-full p-6">
+                <GlassCard className="lift h-full p-6">
                   <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
                     {g.group}
                   </div>
