@@ -14,6 +14,7 @@ const HeroCanvas = lazy(() => import("./hero-canvas"));
 export function Hero() {
   const { t, i18n } = useTranslation();
   const sectionRef = useRef<HTMLElement>(null);
+  const fieldRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
   // Keep three.js off the critical path: mount only after the browser goes idle.
   const idleReady = useIdleReady();
@@ -32,6 +33,50 @@ export function Hero() {
     return () => io.disconnect();
   }, []);
 
+  /**
+   * Pointer parallax for the static hero field.
+   *
+   * The old aurora ran an infinite keyframe loop on a 60px-blurred layer. This
+   * writes two CSS custom properties at most once per frame and only while the
+   * pointer is actually over the hero — no continuous work, nothing on mobile
+   * (fine pointers only), and nothing at all under reduced motion.
+   */
+  useEffect(() => {
+    const el = sectionRef.current;
+    const field = fieldRef.current;
+    if (!el || !field) return;
+    if (typeof matchMedia === "undefined") return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!matchMedia("(pointer: fine)").matches) return;
+
+    let raf = 0;
+    let nx = 0;
+    let ny = 0;
+    const apply = () => {
+      raf = 0;
+      field.style.setProperty("--hx", nx.toFixed(3));
+      field.style.setProperty("--hy", ny.toFixed(3));
+    };
+    const onMove = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      nx = (e.clientX - r.left) / r.width - 0.5;
+      ny = (e.clientY - r.top) / r.height - 0.5;
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    const onLeave = () => {
+      nx = 0;
+      ny = 0;
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    el.addEventListener("pointermove", onMove, { passive: true });
+    el.addEventListener("pointerleave", onLeave);
+    return () => {
+      el.removeEventListener("pointermove", onMove);
+      el.removeEventListener("pointerleave", onLeave);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   const roles = i18n.language?.startsWith("ar") ? profile.rolesAr : profile.roles;
   const chips = ["React", "Next.js", "TypeScript", "Supabase", "Python"];
 
@@ -40,8 +85,13 @@ export function Hero() {
       ref={sectionRef}
       className="relative isolate flex min-h-[100svh] items-center overflow-hidden pt-28"
     >
-      {/* Aurora background */}
-      <div aria-hidden className="aurora animate-gradient" />
+      {/* Luxe static field — replaces the perpetually animated aurora */}
+      <div ref={fieldRef} aria-hidden className="hero-field">
+        <div className="hf-glow" />
+        <div className="hf-silk" />
+        <div className="hf-horizon" />
+        <div className="hf-vignette" />
+      </div>
       {/* 3D layer — only mounted while hero is visible to keep the GPU idle on scroll */}
       <div className="pointer-events-none absolute inset-0 z-[1] opacity-90 [mask-image:radial-gradient(60%_60%_at_70%_40%,#000_40%,transparent_75%)]">
         {inView && idleReady && (
@@ -50,6 +100,7 @@ export function Hero() {
           </Suspense>
         )}
       </div>
+
 
       <div className="relative z-[2] mx-auto grid w-full max-w-6xl gap-10 px-4 sm:px-6">
         <motion.div
