@@ -178,10 +178,12 @@ export function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2, duration: 1 }}
-          className="mt-12 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground"
+          className="mt-12 flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-muted-foreground"
         >
+          <span aria-hidden className="hero-rule" />
           <span>{t("hero.scroll")}</span>
-          <ChevronDown className="size-4 animate-float" />
+          <ChevronDown className="size-4 animate-float text-accent" />
+
         </motion.div>
       </div>
     </section>
