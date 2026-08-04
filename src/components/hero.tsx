@@ -107,7 +107,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 24, filter: "blur(12px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          className="inline-flex items-center gap-2 self-start rounded-full glass-subtle px-3 py-1.5 text-[11px] uppercase tracking-[0.2em] text-muted-foreground"
+          className="inline-flex items-center gap-2 self-start rounded-full glass-subtle glass-rim px-3 py-1.5 text-[11px] uppercase tracking-[0.2em] eyebrow-accent"
         >
           <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse-soft" />
           {t("hero.badge")}
