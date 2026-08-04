@@ -167,7 +167,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 + i * 0.06, duration: 0.5 }}
-              className="rounded-full glass-subtle px-3 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground hover:bg-[var(--glass-3)] motion-reduce:transition-none"
+              className="accent-chip rounded-full px-3 py-1 text-xs transition-colors motion-reduce:transition-none"
             >
               {c}
             </motion.span>
