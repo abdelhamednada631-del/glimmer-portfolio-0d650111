@@ -771,3 +771,142 @@ html:not(:focus-within) .animate-spin-slow {
   outline-offset: 2px;
   border-radius: inherit;
 }
+
+/* =====================================================================
+   Luxe hero field — ADDITIVE. Replaces the perpetually-animated aurora
+   *inside the hero only*. `.aurora` / `aurora-drift` stay defined above so
+   nothing else breaks. Zero continuous animation: one fade-in, plus an
+   optional pointer-driven parallax on a compositor-only transform.
+   ===================================================================== */
+
+@utility hero-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  contain: paint;
+}
+
+/* Layer 1 — deep multi-axis colour field (static, rasterised once). */
+.hero-field .hf-glow {
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(38% 44% at 22% 26%, color-mix(in oklab, var(--aurora-a) 42%, transparent), transparent 72%),
+    radial-gradient(34% 40% at 78% 16%, color-mix(in oklab, var(--aurora-b) 34%, transparent), transparent 72%),
+    radial-gradient(46% 52% at 64% 84%, color-mix(in oklab, var(--aurora-c) 26%, transparent), transparent 74%),
+    radial-gradient(80% 70% at 50% 120%, color-mix(in oklab, var(--aurora-a) 22%, transparent), transparent 70%);
+  filter: blur(70px) saturate(150%);
+  opacity: 0.72;
+  transform: translate3d(calc(var(--hx, 0) * 14px), calc(var(--hy, 0) * 10px), 0);
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.light .hero-field .hf-glow {
+  opacity: 0.5;
+  filter: blur(80px) saturate(125%);
+}
+
+/* Layer 2 — silk: fine brushed-metal lines under a radial mask. */
+.hero-field .hf-silk {
+  position: absolute;
+  inset: -10%;
+  background-image: repeating-linear-gradient(
+    108deg,
+    oklch(1 0 0 / 5.5%) 0px,
+    oklch(1 0 0 / 5.5%) 1px,
+    transparent 1px,
+    transparent 9px
+  );
+  -webkit-mask-image: radial-gradient(58% 62% at 62% 42%, #000 0%, transparent 78%);
+  mask-image: radial-gradient(58% 62% at 62% 42%, #000 0%, transparent 78%);
+  opacity: 0.9;
+  transform: translate3d(calc(var(--hx, 0) * -8px), calc(var(--hy, 0) * -6px), 0);
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.light .hero-field .hf-silk {
+  background-image: repeating-linear-gradient(
+    108deg,
+    color-mix(in oklab, var(--aurora-a) 12%, transparent) 0px,
+    color-mix(in oklab, var(--aurora-a) 12%, transparent) 1px,
+    transparent 1px,
+    transparent 9px
+  );
+  opacity: 0.55;
+}
+
+/* Layer 3 — horizon: a wide, low specular band so the 3D object floats. */
+.hero-field .hf-horizon {
+  position: absolute;
+  inset-inline: -10%;
+  bottom: 4%;
+  height: 42%;
+  background: radial-gradient(
+    50% 100% at 62% 100%,
+    color-mix(in oklab, var(--aurora-b) 28%, transparent),
+    transparent 70%
+  );
+  filter: blur(50px);
+  opacity: 0.55;
+}
+.light .hero-field .hf-horizon {
+  opacity: 0.4;
+}
+
+/* Layer 4 — vignette + top scrim: focuses the eye on the headline. */
+.hero-field .hf-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 90% at 50% 40%, transparent 42%, color-mix(in oklab, var(--background) 88%, transparent) 100%),
+    linear-gradient(to bottom, color-mix(in oklab, var(--background) 55%, transparent) 0%, transparent 26%, transparent 74%, var(--background) 100%);
+}
+
+/* One-time entrance instead of an infinite loop. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-field .hf-glow,
+  .hero-field .hf-silk,
+  .hero-field .hf-horizon {
+    animation: hf-in 1200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .hero-field .hf-silk { animation-delay: 120ms; }
+  .hero-field .hf-horizon { animation-delay: 220ms; }
+}
+@keyframes hf-in {
+  from { opacity: 0; }
+}
+
+/* ---- Specular sweep for the primary CTA (transform-only) ---- */
+@utility specular {
+  position: relative;
+  overflow: hidden;
+}
+.specular::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 35%,
+    oklch(1 0 0 / 28%) 50%,
+    transparent 65%
+  );
+  transform: translate3d(-120%, 0, 0);
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .specular:hover::after { transform: translate3d(120%, 0, 0); }
+}
+
+/* ---- Hero micro-details ---- */
+@utility hero-rule {
+  height: 1px;
+  width: 3.5rem;
+  background: linear-gradient(
+    to right,
+    color-mix(in oklab, var(--accent-solid) 70%, transparent),
+    transparent
+  );
+}
