@@ -139,7 +139,7 @@ export function Hero() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.46 }}
           className="flex flex-wrap items-center gap-3"
         >
-          <MagneticButton variant="primary">
+          <MagneticButton variant="primary" className="specular">
             <Link to="/projects" className="contents">
               {t("hero.view_work")} <ArrowRight className="size-4 rtl-flip" />
             </Link>
