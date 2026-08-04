@@ -804,8 +804,8 @@ html:not(:focus-within) .animate-spin-slow {
   will-change: transform;
 }
 .light .hero-field .hf-glow {
-  opacity: 0.5;
-  filter: blur(80px) saturate(125%);
+  opacity: 0.64;
+  filter: blur(80px) saturate(145%);
 }
 
 /* Layer 2 — silk: fine brushed-metal lines under a radial mask. */
